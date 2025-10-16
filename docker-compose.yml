@@ -32,7 +32,7 @@ services:
       # LLM Configuration (OpenAI)
       - LLM_BINDING=${LLM_BINDING:-openai}
       - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
-      - LLM_MODEL_KWARGS=${LLM_MODEL_KWARGS:-{"temperature": 0.7, "max_tokens": 4000}}
+      - LLM_MODEL_KWARGS=${LLM_MODEL_KWARGS}
       
       # Embedding Configuration (OpenAI)
       - EMBEDDING_BINDING=${EMBEDDING_BINDING:-openai}

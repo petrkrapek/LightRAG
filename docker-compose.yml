@@ -46,6 +46,9 @@ services:
       
       # Database/Storage Configuration
       - WORKING_DIR=${WORKING_DIR:-/app/data/rag_storage}
+      # Model specifikace
+      - LLM_MODEL=gpt-5-mini-2025-08-07
+      - EMBEDDING_MODEL=text-embedding-3-small
       
     restart: unless-stopped
     extra_hosts:

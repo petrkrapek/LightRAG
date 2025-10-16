@@ -5,50 +5,52 @@ services:
     ports:
       - "${PORT:-9621}:9621"
     volumes:
-      # Zachováme vaše současné volumes pro data persistence
+      # Data persistence volumes
       - ./data/rag_storage:/app/data/rag_storage
       - ./data/inputs:/app/data/inputs
       - ./data/tiktoken:/app/data/tiktoken
       - ./config.ini:/app/config.ini
-      # Už NEBUDEME mountovat .env soubor
-      # - ./.env:/app/.env  # ← Toto odstraňte
-    # Už NEBUDEME používat env_file
-    # env_file:           # ← Toto odstraňte
-    #   - .env            # ← Toto odstraňte
     environment:
-      # Stávající nastavení
-      - TIKTOKEN_CACHE_DIR=/app/data/tiktoken
-      - PORT=${PORT:-9621}
-      
-      # JWT Authentication - NOVÉ
-      - AUTH_ACCOUNTS=${AUTH_ACCOUNTS}
-      - TOKEN_SECRET=${TOKEN_SECRET}
-      - TOKEN_EXPIRE_HOURS=${TOKEN_EXPIRE_HOURS:-4}
-      
-      # API Security - NOVÉ
-      - LIGHTRAG_API_KEY=${LIGHTRAG_API_KEY}
-      
       # Server Configuration
       - HOST=${HOST:-0.0.0.0}
+      - PORT=${PORT:-9621}
+      - WORKING_DIR=${WORKING_DIR:-/app/data/rag_storage}
+      - TIKTOKEN_CACHE_DIR=/app/data/tiktoken
       
-      # SSL Configuration (volitelné)
+      # JWT Authentication
+      - AUTH_ACCOUNTS=${AUTH_ACCOUNTS}
+      - TOKEN_SECRET=${TOKEN_SECRET}
+      - TOKEN_EXPIRE_HOURS=${TOKEN_EXPIRE_HOURS:-2}
+      
+      # API Security
+      - LIGHTRAG_API_KEY=${LIGHTRAG_API_KEY}
+      
+      # OpenAI API Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_BASE=${OPENAI_API_BASE:-https://api.openai.com/v1}
+      
+      # LLM Configuration (OpenAI)
+      - LLM_BINDING=${LLM_BINDING:-openai}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4o-mini}
+      - LLM_MODEL_KWARGS=${LLM_MODEL_KWARGS:-{"temperature": 0.7, "max_tokens": 4000}}
+      
+      # Embedding Configuration (OpenAI)
+      - EMBEDDING_BINDING=${EMBEDDING_BINDING:-openai}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-text-embedding-3-large}
+      - EMBEDDING_DIM=${EMBEDDING_DIM:-3072}
+      
+      # SSL Configuration (optional)
       - SSL=${SSL:-false}
       - SSL_CERTFILE=${SSL_CERTFILE}
       - SSL_KEYFILE=${SSL_KEYFILE}
       
-      # LLM Configuration - přidejte podle potřeby
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_API_BASE=${OPENAI_API_BASE}
-      
-      # Embedding Configuration
-      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
-      - EMBEDDING_API_KEY=${EMBEDDING_API_KEY}
-      
-      # Database/Storage Configuration
-      - WORKING_DIR=${WORKING_DIR:-/app/data/rag_storage}
-      # Model specifikace
-      - LLM_MODEL=gpt-5-mini-2025-08-07
-      - EMBEDDING_MODEL=text-embedding-3-small
+      # Performance Tuning
+      - SUMMARY_CONTEXT_SIZE=${SUMMARY_CONTEXT_SIZE:-10000}
+      - SUMMARY_MAX_TOKENS=${SUMMARY_MAX_TOKENS:-500}
+      - MAX_ASYNC=${MAX_ASYNC:-4}
+      - COSINE_THRESHOLD=${COSINE_THRESHOLD:-0.2}
+      - TOP_K=${TOP_K:-60}
+      - CHUNK_TOP_K=${CHUNK_TOP_K:-20}
       
     restart: unless-stopped
     extra_hosts:

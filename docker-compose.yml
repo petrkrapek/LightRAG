@@ -19,6 +19,9 @@ services:
       - .env
     environment:
       - TIKTOKEN_CACHE_DIR=/app/data/tiktoken
+      - AUTH_ACCOUNTS=${AUTH_ACCOUNTS}
+      - TOKEN_SECRET=${TOKEN_SECRET}
+      - TOKEN_EXPIRE_HOURS=${TOKEN_EXPIRE_HOURS}
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"

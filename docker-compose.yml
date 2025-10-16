@@ -2,26 +2,51 @@ services:
   lightrag:
     container_name: lightrag
     image: ghcr.io/hkuds/lightrag:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-      tags:
-        - ghcr.io/hkuds/lightrag:latest
     ports:
       - "${PORT:-9621}:9621"
     volumes:
+      # Zachováme vaše současné volumes pro data persistence
       - ./data/rag_storage:/app/data/rag_storage
       - ./data/inputs:/app/data/inputs
       - ./data/tiktoken:/app/data/tiktoken
       - ./config.ini:/app/config.ini
-      - ./.env:/app/.env
-    env_file:
-      - .env
+      # Už NEBUDEME mountovat .env soubor
+      # - ./.env:/app/.env  # ← Toto odstraňte
+    # Už NEBUDEME používat env_file
+    # env_file:           # ← Toto odstraňte
+    #   - .env            # ← Toto odstraňte
     environment:
+      # Stávající nastavení
       - TIKTOKEN_CACHE_DIR=/app/data/tiktoken
+      - PORT=${PORT:-9621}
+      
+      # JWT Authentication - NOVÉ
       - AUTH_ACCOUNTS=${AUTH_ACCOUNTS}
       - TOKEN_SECRET=${TOKEN_SECRET}
-      - TOKEN_EXPIRE_HOURS=${TOKEN_EXPIRE_HOURS}
+      - TOKEN_EXPIRE_HOURS=${TOKEN_EXPIRE_HOURS:-4}
+      
+      # API Security - NOVÉ
+      - LIGHTRAG_API_KEY=${LIGHTRAG_API_KEY}
+      
+      # Server Configuration
+      - HOST=${HOST:-0.0.0.0}
+      
+      # SSL Configuration (volitelné)
+      - SSL=${SSL:-false}
+      - SSL_CERTFILE=${SSL_CERTFILE}
+      - SSL_KEYFILE=${SSL_KEYFILE}
+      
+      # LLM Configuration - přidejte podle potřeby
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_BASE=${OPENAI_API_BASE}
+      
+      # Embedding Configuration
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL}
+      - EMBEDDING_API_KEY=${EMBEDDING_API_KEY}
+      
+      # Database/Storage Configuration
+      - WORKING_DIR=${WORKING_DIR:-/app/data/rag_storage}
+      
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
